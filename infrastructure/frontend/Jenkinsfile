@@ -28,7 +28,7 @@ pipeline {
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
                     dir(env.TF_DIR) {
-                        sh 'terraform init -input=false'
+                        sh 'terraform init -input=false -backend-config=backend.hcl'
                     }
                 }
             }
