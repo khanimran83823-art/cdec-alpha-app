@@ -1,4 +1,3 @@
-bucket         = "my-unique-frontend-bucket"
-key            = "frontend/terraform.tfstate"
-region         = "eu-west-1"
-dynamodb_table = "your-lock-table" # Optional
+bucket = "imran-cdec-frontend-tfstate-euwest1"
+key    = "frontend/terraform.tfstate"
+region = "eu-west-1"
