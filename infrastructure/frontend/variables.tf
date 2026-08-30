@@ -19,7 +19,7 @@ variable "application" {
 variable "bucket_name" {
   description = "Globally unique S3 bucket name. Leave null to use {application}-{environment}-frontend."
   type        = string
-  default     = null
+  default     = "cdec-alpha-frontend-app-unique-987"
 }
 
 variable "force_destroy" {
