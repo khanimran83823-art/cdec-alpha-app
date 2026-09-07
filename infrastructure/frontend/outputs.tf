@@ -24,7 +24,7 @@ output "cloudfront_distribution_arn" {
 }
 
 # -----------------------------------------------------------------------------
-# Route 53 Outputs — Fixed from module to native resources
+# Route 53 Outputs — Fixed Index Keys
 # -----------------------------------------------------------------------------
 
 output "route53_zone_id" {
@@ -40,7 +40,7 @@ output "route53_name_servers" {
 output "dns_record_fqdns" {
   description = "FQDNs for DNS records created by this stack."
   value       = compact([
-    length(aws_route53_record.ipv4) > 0 ? aws_route53_record.ipv4.fqdn : "",
-    length(aws_route53_record.ipv6) > 0 ? aws_route53_record.ipv6.fqdn : ""
+    length(aws_route53_record.ipv4) > 0 ? aws_route53_record.ipv4[0].fqdn : "",
+    length(aws_route53_record.ipv6) > 0 ? aws_route53_record.ipv6[0].fqdn : ""
   ])
 }
