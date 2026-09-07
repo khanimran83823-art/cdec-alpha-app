@@ -4,8 +4,9 @@ aws_region  = "eu-west-1"
 environment = "dev"
 application = "cdec-alpha"
 
-acm_certificate_arn = "arn:aws:acm:us-east-1:933516006319:certificate/fd6dd327-9040-4390-b756-672c18a25ff3"
+# Isse null kar dein kyunki code khud fresh certificate banayega
+acm_certificate_arn = null
 
 dns_zone_name      = "imranlearn.online"
-dns_record_name    = "www.imranlearn.online"    # Ya fir agar seedhe naked domain chahiye toh sirf "imranlearn.online"
+dns_record_name    = "www.imranlearn.online"   
 cloudfront_aliases = ["www.imranlearn.online"]
