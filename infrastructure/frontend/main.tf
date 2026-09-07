@@ -14,6 +14,14 @@ check "acm_certificate_with_custom_domain" {
   }
 }
 
+# 1. YEH BLOCK ADD KAREIN: Yeh automatically N. Virginia (us-east-1) se certificate dhoondh lega
+data "aws_acm_certificate" "cloudfront_cert" {
+  count    = length(local.cloudfront_aliases) > 0 ? 1 : 0
+  provider = aws.us_east_1 # Aapka naya provider alias use ho raha hai yahan
+  domain   = local.cloudfront_aliases[0] 
+  statuses = ["ISSUED"]
+}
+
 module "cloudfront" {
   source = "../modules/cloudfront"
 
@@ -25,7 +33,9 @@ module "cloudfront" {
   enable_versioning = var.enable_versioning
 
   aliases             = local.cloudfront_aliases
-  acm_certificate_arn = var.acm_certificate_arn
+  
+  # 2. YEH LINE UPDATE KAREIN: Ab yeh us-east-1 wale certificate ka exact ARN use karega
+  acm_certificate_arn = length(local.cloudfront_aliases) > 0 ? data.aws_acm_certificate.cloudfront_cert[0].arn : null
   enable_spa_routing  = var.enable_spa_routing
 
   tags = {
