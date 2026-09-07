@@ -14,6 +14,18 @@ check "acm_certificate_with_custom_domain" {
   }
 }
 
+# 1. YEH RESOURCE BLOCK ADD KAREIN: Yeh aapke domain ke liye us-east-1 me fresh certificate banayega
+resource "aws_acm_certificate" "cloudfront_cert" {
+  count             = length(local.cloudfront_aliases) > 0 ? 1 : 0
+  provider          = aws.us_east_1 # Hamari provider.tf ka us-east-1 configuration use hoga
+  domain_name       = local.cloudfront_aliases[0]
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 module "cloudfront" {
   source = "../modules/cloudfront"
 
@@ -25,7 +37,9 @@ module "cloudfront" {
   enable_versioning = var.enable_versioning
 
   aliases             = local.cloudfront_aliases
-  acm_certificate_arn = var.acm_certificate_arn
+  
+  # 2. UPDATE KAREIN: Purana variable hata kar yahan automatic new certificate ka ARN pass karein
+  acm_certificate_arn = length(local.cloudfront_aliases) > 0 ? aws_acm_certificate.cloudfront_cert[0].arn : null
   enable_spa_routing  = var.enable_spa_routing
 
   tags = {
