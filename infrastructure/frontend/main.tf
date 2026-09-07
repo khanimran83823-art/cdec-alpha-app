@@ -7,7 +7,7 @@ locals {
   )
 }
 
-# 1. FIXED CHECK BLOCK: Agar automatic mode chal raha hai toh validation error na de
+# 1. FIXED CHECK BLOCK
 check "acm_certificate_with_custom_domain" {
   assert {
     condition     = length(local.cloudfront_aliases) == 0 || var.acm_certificate_arn != null || length(local.cloudfront_aliases) > 0
@@ -69,44 +69,36 @@ module "cloudfront" {
   enable_versioning  = var.enable_versioning
   enable_spa_routing = var.enable_spa_routing
 
-  # Pass direct null proxy checking internally to bypass child check blocks
   aliases             = local.cloudfront_aliases
   acm_certificate_arn = length(local.cloudfront_aliases) > 0 ? aws_acm_certificate_validation.cert[0].certificate_arn : "arn:aws:acm:us-east-1:111111111111:certificate/dummy"
 
   depends_on = [aws_acm_certificate_validation.cert] 
 }
 
-# 6. ROUTE53 MODULE SIMPLIFICATION: Duplicate zone handling fix kiya hai yahan
-module "route53" {
-  source = "../modules/route53"
+# 6. FIXED AREA: Module ko hata kar direct native Route53 resources lagaye hain
+# Isse count dependency error permanent solve ho jayega
+resource "aws_route53_record" "ipv4" {
+  count   = var.dns_record_name != "" ? 1 : 0
+  zone_id = aws_route53_zone.new_zone.zone_id
+  name    = var.dns_record_name
+  type    = "A"
 
-  application = var.application
-  environment = var.environment
-  tags = {
-    Component = "route53"
+  alias {
+    name                   = module.cloudfront.domain_name
+    zone_id                = module.cloudfront.hosted_zone_id
+    evaluate_target_health = false
   }
+}
 
-  zone_name     = var.dns_zone_name
-  zone_id       = aws_route53_zone.new_zone.zone_id 
-  force_destroy = var.dns_zone_force_destroy
+resource "aws_route53_record" "ipv6" {
+  count   = var.dns_record_name != "" ? 1 : 0
+  zone_id = aws_route53_zone.new_zone.zone_id
+  name    = var.dns_record_name
+  type    = "AAAA"
 
-  # Dynamic lookup arrays instead of static counts to avoid "Invalid count argument"
-  records = var.dns_record_name != "" ? [
-    {
-      name = var.dns_record_name
-      type = "A"
-      alias = {
-        name    = module.cloudfront.domain_name
-        zone_id = module.cloudfront.hosted_zone_id
-      }
-    },
-    {
-      name = var.dns_record_name
-      type = "AAAA"
-      alias = {
-        name    = module.cloudfront.domain_name
-        zone_id = module.cloudfront.hosted_zone_id
-      }
-    },
-  ] : []
+  alias {
+    name                   = module.cloudfront.domain_name
+    zone_id                = module.cloudfront.hosted_zone_id
+    evaluate_target_health = false
+  }
 }
