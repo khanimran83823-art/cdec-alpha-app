@@ -23,17 +23,24 @@ output "cloudfront_distribution_arn" {
   value       = module.cloudfront.distribution_arn
 }
 
+# -----------------------------------------------------------------------------
+# Route 53 Outputs — Fixed from module to native resources
+# -----------------------------------------------------------------------------
+
 output "route53_zone_id" {
   description = "Route 53 hosted zone ID."
-  value       = module.route53.zone_id
+  value       = aws_route53_zone.new_zone.zone_id
 }
 
 output "route53_name_servers" {
-  description = "Name servers when this stack created a new zone."
-  value       = module.route53.name_servers
+  description = "Name servers when this stack created a new zone. Update these in GoDaddy/Hostinger!"
+  value       = aws_route53_zone.new_zone.name_servers
 }
 
 output "dns_record_fqdns" {
   description = "FQDNs for DNS records created by this stack."
-  value       = module.route53.record_fqdns
+  value       = compact([
+    length(aws_route53_record.ipv4) > 0 ? aws_route53_record.ipv4.fqdn : "",
+    length(aws_route53_record.ipv6) > 0 ? aws_route53_record.ipv6.fqdn : ""
+  ])
 }
