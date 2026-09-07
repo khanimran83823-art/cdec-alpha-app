@@ -28,23 +28,14 @@ resource "aws_acm_certificate" "cloudfront_cert" {
 
 module "cloudfront" {
   source = "../modules/cloudfront"
-
-  application = var.application
-  environment = var.environment
-
-  bucket_name       = var.bucket_name
-  force_destroy     = var.force_destroy
-  enable_versioning = var.enable_versioning
+  # ... baaki saare parameters bilkul same rahenge ...
 
   aliases             = local.cloudfront_aliases
-  
-  # 2. UPDATE KAREIN: Purana variable hata kar yahan automatic new certificate ka ARN pass karein
-  acm_certificate_arn = length(local.cloudfront_aliases) > 0 ? aws_acm_certificate.cloudfront_cert[0].arn : null
+  acm_certificate_arn = length(local.cloudfront_aliases) > 0 ? aws_acm_certificate_validation.cert[0].certificate_arn : null
   enable_spa_routing  = var.enable_spa_routing
 
-  tags = {
-    Component = "cloudfront"
-  }
+  # YEH LINE ADD KAREIN: Yeh pipeline ko validate hone tak rok kar rakhega
+  depends_on = [aws_acm_certificate_validation.cert] 
 }
 
 module "route53" {
