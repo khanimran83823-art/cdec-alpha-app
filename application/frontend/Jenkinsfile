@@ -24,17 +24,17 @@ pipeline {
         )
         string(
             name: 'VITE_AUTH_API',
-            defaultValue: 'https://api.thecloudnine.in/api/auth',
+            defaultValue: 'https://api.imranlearn.online/api/auth',
             description: 'Auth API URL baked into the build'
         )
         string(
             name: 'VITE_COURSE_API',
-            defaultValue: 'https://api.thecloudnine.in/api/courses',
+            defaultValue: 'https://api.imranlearn.online/api/courses',
             description: 'Course API URL baked into the build'
         )
         string(
             name: 'VITE_ENROLL_API',
-            defaultValue: 'https://api.thecloudnine.in/api/enroll',
+            defaultValue: 'https://api.imranlearn.online/api/enroll',
             description: 'Enrollment API URL baked into the build'
         )
     }
@@ -48,7 +48,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/atulyw/cdec-alpha-app.git', branch: 'main'
+                git url: 'https://github.com/khanimran83823-art/cdec-alpha-app.git', branch: 'main'
             }
         }
 
