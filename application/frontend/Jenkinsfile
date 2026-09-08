@@ -8,19 +8,19 @@
 
 pipeline {
     agent {
-        label 'terraform'
+        label 'ecs-agent'
     }
 
     parameters {
         string(
             name: 'S3_BUCKET',
-            defaultValue: 'cdec-alpha-dev-frontend',
+            defaultValue: 'cdec-alpha-frontend-app-unique-987',
             description: 'S3 bucket name for the frontend (e.g. cdec-frontend-dev-frontend)'
         )
         string(
             name: 'CLOUDFRONT_DISTRIBUTION_ID',
-            defaultValue: 'E2T929LQJJ7AIS',
-            description: 'CloudFront distribution ID (e.g. E1234567890ABC)'
+            defaultValue: 'E2CMJPEOIZCM5I',
+            description: 'CloudFront distribution ID (e.g. E2CMJPEOIZCM5I)'
         )
         string(
             name: 'VITE_AUTH_API',
