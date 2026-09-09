@@ -1,18 +1,17 @@
-# Copy to terraform.tfvars. Do not commit terraform.tfvars.
-
-aws_region   = "ap-south-1"
+# AWS Region & Project Details
+aws_region   = "eu-west-1"
 environment  = "dev"
 project_name = "cdec-alpha"
 cluster_name = "cdec-eks-dev"
 
-# VPC — change AZ names for your region
+# VPC Configuration (eu-west-1 Availability Zones)
 vpc_cidr             = "10.0.0.0/16"
 public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
 private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
-availability_zones = ["ap-south-1a", "ap-south-1b"]
-single_nat_gateway = true
+availability_zones   = ["eu-west-1a", "eu-west-1b"]
+single_nat_gateway   = true
 
-# EKS
+# EKS Cluster Configuration
 kubernetes_version  = "1.34"
 node_instance_types = ["c7i-flex.large"]
 desired_size        = 2
@@ -28,11 +27,22 @@ cluster_admin_principal_arns    = []
 include_caller_as_cluster_admin = true
 
 additional_tags = {
-  Owner = "platform-team"
+  Owner       = "platform-team"
+  Environment = "dev"
+  Project     = "cdec-alpha"
 }
 
-# ALB Ingress — AWS Load Balancer Controller + API ingress
+# DNS & Domains Configuration
+dns_zone_name      = "imranlearn.online"
+dns_record_name    = "www.imranlearn.online"
+cloudfront_aliases = [
+  "www.imranlearn.online",
+  "infra-imranlearn.online",
+  "api.infra-imranlearn.online"
+]
+
+# ALB Ingress & ACM Certificate
 enable_alb_ingress  = true
-ingress_host        = "api.thecloudnine.in"
-acm_certificate_arn = "arn:aws:acm:eu-west-1:933516006319:certificate/dab4d476-ddf2-40ef-ae09-0d3ced0e76e1"
+ingress_host        = "www.imranlearn.online"
+acm_certificate_arn = "arn:aws:acm:us-east-1:147741822158:certificate/0a419ca2-cc77-4226-95b5-a01376f63313"
 alb_name            = "cdec-alpha-alb"
