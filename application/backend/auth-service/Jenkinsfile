@@ -7,11 +7,12 @@
 // EKS access: IAM principal must be in infrastructure/backend terraform.tfvars
 //   cluster_admin_principal_arns (see backend README — kubectl access)
 
+// Auth service deploy pipeline — build & push with Kaniko, roll out to EKS
 pipeline {
     agent {
         label 'ecs-agent'
     }
-    
+
     environment {
         EKS_CLUSTER        = 'cdec-eks-dev'
         EKS_REGION         = 'eu-west-1'
@@ -30,15 +31,7 @@ pipeline {
             }
         }
 
-        stage('Build Docker image') {
-            steps {
-                dir('application/backend/auth-service') {
-                    sh 'docker build -t ${FULL_IMAGE_URI} .'
-                }
-            }
-        }
-
-        stage('Push to ECR') {
+        stage('Build & Push with Kaniko') {
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding',
@@ -46,11 +39,20 @@ pipeline {
                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
-                    sh '''
-                        aws ecr get-login-password --region ${EKS_REGION} | \
-                            docker login --username AWS --password-stdin ${ECR_REGISTRY}
-                        docker push ${FULL_IMAGE_URI}
-                    '''
+                    dir('application/backend/auth-service') {
+                        sh '''
+                            # Configure Kaniko ECR Credentials
+                            mkdir -p /kaniko/.docker
+                            echo "{\\"credsStore\\":\\"ecr-login\\"}" > /kaniko/.docker/config.json
+
+                            # Build Docker Image and Push directly to ECR using Kaniko
+                            /kaniko/executor \
+                                --context=. \
+                                --dockerfile=Dockerfile \
+                                --destination=${FULL_IMAGE_URI} \
+                                --cache=true
+                        '''
+                    }
                 }
             }
         }
