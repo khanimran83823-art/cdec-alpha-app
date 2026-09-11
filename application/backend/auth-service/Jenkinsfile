@@ -41,17 +41,18 @@ pipeline {
                 ]]) {
                     dir('application/backend/auth-service') {
                         sh '''
-                            # Home directory me docker config prepare karein (no root permission required)
-                            mkdir -p $HOME/.docker
-                            echo "{\\"credsStore\\":\\"ecr-login\\"}" > $HOME/.docker/config.json
+    # Home directory me docker config prepare karein
+    mkdir -p $HOME/.docker
+    echo "{\\"credsStore\\":\\"ecr-login\\"}" > $HOME/.docker/config.json
 
-                            # Execute Kaniko binary using home directory config
-                            /kaniko/executor \
-                                --context=. \
-                                --dockerfile=Dockerfile \
-                                --destination=${FULL_IMAGE_URI} \
-                                --cache=true
-                        '''
+    # Kaniko PATH add karke execute karein
+    export PATH=$PATH:/kaniko
+    executor \
+        --context=. \
+        --dockerfile=Dockerfile \
+        --destination=${FULL_IMAGE_URI} \
+        --cache=true
+'''
                     }
                 }
             }
