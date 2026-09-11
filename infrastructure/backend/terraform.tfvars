@@ -44,5 +44,5 @@ cloudfront_aliases = [
 # ALB Ingress & ACM Certificate
 enable_alb_ingress  = true
 ingress_host        = "www.imranlearn.online"
-acm_certificate_arn = "arn:aws:acm:us-east-1:147741822158:certificate/0a419ca2-cc77-4226-95b5-a01376f63313"
+acm_certificate_arn = "arn:aws:acm:eu-west-1:147741822158:certificate/7e6bc38b-6243-490b-8721-565882cd649d"
 alb_name            = "cdec-alpha-alb"
