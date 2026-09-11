@@ -9,7 +9,7 @@
 
 pipeline {
     agent {
-        label 'terraform'
+        label 'ecs-agent'
     }
     
     environment {
@@ -21,7 +21,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/atulyw/cdec-alpha-app.git', branch: 'main'
+                git url: 'https://github.com/khanimran83823-art/cdec-alpha-app', branch: 'main'
             }
         }
 
