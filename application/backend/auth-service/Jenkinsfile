@@ -41,11 +41,11 @@ pipeline {
                 ]]) {
                     dir('application/backend/auth-service') {
                         sh '''
-                            # Configure Kaniko ECR Credentials
-                            mkdir -p /kaniko/.docker
-                            echo "{\\"credsStore\\":\\"ecr-login\\"}" > /kaniko/.docker/config.json
+                            # Home directory me docker config prepare karein (no root permission required)
+                            mkdir -p $HOME/.docker
+                            echo "{\\"credsStore\\":\\"ecr-login\\"}" > $HOME/.docker/config.json
 
-                            # Build Docker Image and Push directly to ECR using Kaniko
+                            # Execute Kaniko binary using home directory config
                             /kaniko/executor \
                                 --context=. \
                                 --dockerfile=Dockerfile \
