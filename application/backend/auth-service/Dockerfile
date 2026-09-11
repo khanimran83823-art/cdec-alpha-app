@@ -1,29 +1,20 @@
-# ---------- Stage 1: Build ----------
-    FROM maven:3.9.9-eclipse-temurin-21 AS builder
+FROM gcr.io/kaniko-project/executor:v1.23.2-debug AS kaniko
+FROM jenkins/inbound-agent:latest
 
-    WORKDIR /app
-    
-    # Copy pom.xml first (better caching)
-    COPY pom.xml .
-    
-    # Download dependencies
-    RUN mvn dependency:go-offline -B
-    
-    # Copy source code
-    COPY src ./src
-    
-    # Build jar
-    RUN mvn clean package -DskipTests
-    
-    
-    # ---------- Stage 2: Runtime ----------
-    FROM eclipse-temurin:21-jdk-jammy
-    
-    WORKDIR /app
-    
-    # Copy only the built jar from builder stage
-    COPY --from=builder /app/target/auth-service-1.0.0.jar app.jar
-    
-    EXPOSE 8081
-    
-    CMD ["java", "-jar", "app.jar"]
+USER root
+
+# AWS CLI, kubectl, aur Maven install karein
+RUN apt-get update && apt-get install -y \
+    curl unzip ca-certificates maven \
+    && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+    && unzip awscliv2.zip && ./aws/install && rm -rf awscliv2.zip aws \
+    && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
+    && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Kaniko binaries copy karein
+COPY --from=kaniko /kaniko /kaniko
+ENV PATH=$PATH:/kaniko
+ENV SSL_CERT_DIR=/kaniko/ssl/certs
+
+USER jenkins
